@@ -19,9 +19,9 @@ public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final int REQUEST_CODE_CHEAT = 0;
-    private static int TOTALQUESTIONS = 5;
 
     private static final String MORALITY = "CHEATED_OR_NOT?";
+
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -31,7 +31,6 @@ public class QuizActivity extends AppCompatActivity {
     private TextView mQuestionTextView;
 
     private int mCurrentIndex;
-    private boolean[] cheated = new boolean[TOTALQUESTIONS];
     private boolean mIsCheater;
 
     private Question[] mQuestionBank = new Question[] {
@@ -50,7 +49,7 @@ public class QuizActivity extends AppCompatActivity {
     private void checkAnswer(boolean userPressedTrue){
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
         int messageResId;
-        if(cheated[mCurrentIndex]){
+        if(mIsCheater){
             messageResId = R.string.judgement_toast;
         }else {
             if (userPressedTrue == answerIsTrue) {
@@ -135,8 +134,7 @@ public class QuizActivity extends AppCompatActivity {
         });
         if(savedInstanceState != null){
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
-            cheated = savedInstanceState.getBooleanArray(MORALITY);
-            mIsCheater = cheated[mCurrentIndex];
+            mIsCheater = savedInstanceState.getBoolean(MORALITY);
         }
         updateQuestion();
     }
@@ -145,7 +143,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
-        savedInstanceState.putBooleanArray(MORALITY, cheated);
+        savedInstanceState.putBoolean(MORALITY, mIsCheater);
     }
     @Override
     protected void onStart() {
@@ -188,7 +186,6 @@ public class QuizActivity extends AppCompatActivity {
                 return;
             }
             mIsCheater = CheatActivity.wasAnswerShown(data);
-            cheated[mCurrentIndex] = mIsCheater;
         }
     }
     @Override
