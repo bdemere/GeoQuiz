@@ -1,13 +1,17 @@
 package com.bignerdranch.android.geoquiz;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -26,6 +30,7 @@ public class CheatActivity extends AppCompatActivity {
     private boolean hasSeen = false;
 
     private TextView mAnswerTextView;
+    private TextView mAPI_level;
     private Button mShowAnswer;
 
 
@@ -53,6 +58,9 @@ public class CheatActivity extends AppCompatActivity {
         mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
 
         mAnswerTextView = (TextView)findViewById(R.id.answer_text_view);
+        mAPI_level = (TextView)findViewById(R.id.api_level_text);
+        String API  = "API level " + Build.VERSION.SDK_INT;
+        mAPI_level.setText(API);
         mShowAnswer = (Button)findViewById(R.id.show_answer_button);
         mShowAnswer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +72,27 @@ public class CheatActivity extends AppCompatActivity {
                 }
                 hasSeen = true;
                 setAnswerShownResult(hasSeen);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    int cx = mShowAnswer.getWidth() / 2;
+                    int cy = mShowAnswer.getHeight() / 2;
+                    float radius = mShowAnswer.getWidth();
+                    Animator anim = ViewAnimationUtils.createCircularReveal
+                            (mShowAnswer, cx, cy, radius, 0);
+                    anim.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            mAnswerTextView.setVisibility(View.VISIBLE);
+                            mShowAnswer.setVisibility(View.INVISIBLE);
+
+                        }
+
+                    });
+                    anim.start();
+                } else {
+                    mAnswerTextView.setVisibility(View.VISIBLE);
+                    mShowAnswer.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
